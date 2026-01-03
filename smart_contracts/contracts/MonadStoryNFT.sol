@@ -1,14 +1,14 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
-import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
+ import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
+ import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
-import "@openzeppelin/contracts/utils/Counters.sol";
 
-contract MonadStoryNFT is ERC721, ERC721URIStorage, Ownable {
-    using Counters for Counters.Counter;
-    Counters.Counter private _tokenIdCounter;
+error Withdrawal_Failed();
+
+contract MonadStoryNFT is ERC721URIStorage, Ownable , ReentrancyGuard {
+    uint256 private _tokenIdCounter;
 
     // Base URI for metadata
     string private _baseURIextended;
@@ -24,7 +24,7 @@ contract MonadStoryNFT is ERC721, ERC721URIStorage, Ownable {
 
     event StoryMinted(uint256 indexed tokenId, address indexed owner, string storyHash, string metadataURI);
 
-    constructor() ERC721("GroqTales Story NFT", "GTALE") {
+    constructor() ERC721("GroqTales Story NFT", "GTALE") Ownable(msg.sender) {
         _baseURIextended = "ipfs://";
     }
 
@@ -46,10 +46,10 @@ contract MonadStoryNFT is ERC721, ERC721URIStorage, Ownable {
         returns (uint256)
     {
         require(msg.value >= mintPrice, "Insufficient payment for minting");
-        uint256 tokenId = _tokenIdCounter.current();
+        uint256 tokenId = _tokenIdCounter;
         require(tokenId < MAX_SUPPLY, "Maximum supply reached");
 
-        _tokenIdCounter.increment();
+        _tokenIdCounter++;
         _safeMint(msg.sender, tokenId);
         _setTokenURI(tokenId, metadataURI);
         _storyContent[tokenId] = storyHash;
@@ -59,30 +59,23 @@ contract MonadStoryNFT is ERC721, ERC721URIStorage, Ownable {
         return tokenId;
     }
 
+    function burnStory(uint256 tokenId) public returns (bool) {
+        _checkAuthorized(_ownerOf(tokenId), msg.sender, tokenId);
+        _burn(tokenId);
+        delete _storyContent[tokenId];
+        return true;
+    }
+
     function getStoryContent(uint256 tokenId) public view returns (string memory) {
-        require(_exists(tokenId), "Token does not exist");
+        require(_ownerOf(tokenId) != address(0), "Token does not exist");
         return _storyContent[tokenId];
     }
 
-    function withdrawFunds() external onlyOwner {
+    function withdrawFunds() external onlyOwner nonReentrant {
         uint256 balance = address(this).balance;
-        payable(owner()).transfer(balance);
+        (bool success,) = payable(owner()).call{value : balance}("");
+        if(!success) {
+            revert Withdrawal_Failed();
+        }
     }
-
-    // The following functions are overrides required by Solidity.
-
-    function _burn(uint256 tokenId) internal override(ERC721, ERC721URIStorage) {
-        super._burn(tokenId);
-    }
-
-    function tokenURI(uint256 tokenId)
-        public
-        view
-        override(ERC721, ERC721URIStorage)
-        returns (string memory)
-    {
-        return super.tokenURI(tokenId);
-    }
-
-    receive() external payable {}
 }
