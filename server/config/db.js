@@ -33,7 +33,7 @@ const connectDB = async (maxRetries = 5, retryDelayMs = 2000) => {
     } catch (error) {
       const errorMessage = error.message || 'Unknown error';
       console.error(
-        `[Mongoose] Attempt ${attempt}/${maxRetries} failed: ${errorMessage}`
+        `[Mongoose] Attempt ${attempt}/${safeMaxRetries} failed: ${errorMessage}`
       );
 
       if (attempt === safeMaxRetries) {

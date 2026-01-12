@@ -63,13 +63,14 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
+  const dbConnected = mongoose.connection.readyState === 1;
   res.json({
-    status: 'healthy',
+    status: dbConnected ? 'healthy' : 'degraded',
     timestamp: new Date().toISOString(),
     version: process.env.API_VERSION || 'v1',
     environment: process.env.NODE_ENV || 'development',
     database: {
-      connected: mongoose.connection.readyState === 1,
+      connected: dbConnected,
       readyState: mongoose.connection.readyState,
     },
   });
