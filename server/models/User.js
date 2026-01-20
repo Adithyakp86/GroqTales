@@ -5,18 +5,21 @@ const UserSchema = new mongoose.Schema(
   {
     email: {
       type: String,
-      required: true,
       unique: true,
+      required: true,
       lowercase: true,
       trim: true,
-      match: [/^\S+@\S+\.\S+$/, 'Invalid email address'],
-    },    
-    password: { type: String, required: true , select: false},
+    },
+    password: { type: String, required: true },
     firstName: { type: String, required: true, trim: true },
     lastName: { type: String, required: true, trim: true },
     phone: { type: String, default: null },
-    walletAddress: { type: String, default: null },
-    role: {type:String,enum:['user','admin'],default:'user'},
+    location: { type: String, default: null },
+    role: {
+      type: String,
+      enum: ['ngo', 'doctor', 'health_worker', 'patient'],
+      required: true,
+    },
   },
   { timestamps: true }
 );
@@ -32,5 +35,4 @@ UserSchema.methods.comparePassword = function (plain) {
   return bcrypt.compare(plain, this.password);
 };
 
-const User = mongoose.model('User', UserSchema);
-module.exports = User;
+module.exports = mongoose.model('User', UserSchema);

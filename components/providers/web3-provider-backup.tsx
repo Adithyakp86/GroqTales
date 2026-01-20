@@ -255,8 +255,8 @@ export const Web3Provider = ({ children }: { children: React.ReactNode }) => {
           Math.random() > 0.3
             ? 'listed'
             : Math.random() > 0.5
-            ? 'unlisted'
-            : 'sold',
+              ? 'unlisted'
+              : 'sold',
         metadata: {
           attributes: [
             {

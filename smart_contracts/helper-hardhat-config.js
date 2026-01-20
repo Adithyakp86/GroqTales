@@ -1,15 +1,15 @@
 const networkConfig = {
   31337: {
-    name: "hardhat",
+    name: 'hardhat',
   },
-  143:{
-    name: "monad_mainnet",
+  143: {
+    name: 'monad_mainnet',
   },
-  10143:{
-    name: "monad_testnet",
-  }
+  10143: {
+    name: 'monad_testnet',
+  },
 };
-const developmentChains = ["hardhat", "localhost"];
+const developmentChains = ['hardhat', 'localhost'];
 
 module.exports = {
   networkConfig,

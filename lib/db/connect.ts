@@ -207,7 +207,7 @@ export async function measureLatency(): Promise<number | null> {
     console.error('[DB] Error measuring latency:', error);
     state.isConnected = false;
     state.lastError = error instanceof Error ? error.message : 'Ping failed';
-    
+
     // Close potentially stale client
     if (state.client) {
       try {
@@ -217,7 +217,7 @@ export async function measureLatency(): Promise<number | null> {
       }
       state.client = null;
     }
-    
+
     return null;
   }
 }

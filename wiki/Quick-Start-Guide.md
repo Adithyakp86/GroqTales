@@ -40,6 +40,7 @@ already started, follow these steps:
    ```
 
    Wait for the server to start (you'll see output like `ready - started server on 0.0.0.0:3000`).
+
 3. **Access GroqTales**: Open your web browser and go to:
 
    ```
@@ -137,7 +138,6 @@ After creating your story, decide whether to share it with the community for fre
 unique digital asset (NFT) on the blockchain.
 
 - **Publish for Free**: To make your story accessible to everyone without blockchain involvement:
-
   1. Ensure you're logged in or have a connected wallet (if required by the platform).
   2. Click the "Publish Story" button or navigate to the "Publish" tab if available.
   3. Confirm the publication. Your story will appear in the Community Gallery or your profile for

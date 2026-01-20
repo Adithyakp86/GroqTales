@@ -115,7 +115,6 @@ and deployment details.
 ## For Developers
 
 - **Folder Structure:**
-
   - `/app` – Next.js application (pages, UI, routes)
   - `/components` – Reusable React components
   - `/contracts` – Solidity smart contracts for NFT minting
@@ -125,22 +124,18 @@ and deployment details.
   - `/scripts` – Automation and deployment scripts
 
 - **Environment Variables:**
-
   - `GROQ_API_KEY` – Your Groq AI API key
   - `UNSPLASH_API_KEY` – (Optional) for placeholder visuals
   - `MONAD_RPC_URL` – Monad blockchain RPC endpoint
 
 - **Smart Contract Deployment:**
-
   - Contracts are written in Solidity and can be deployed to Monad Testnet/Mainnet.
   - See `/contracts` and `/scripts` for deployment instructions.
 
 - **Extending AI Models:**
-
   - AI logic is modular—add support for new models or prompt types in `/lib` and `/components`.
 
 - **Testing:**
-
   - Frontend: Use Jest/React Testing Library.
   - Smart Contracts: Use Hardhat/Foundry for Solidity tests.
 

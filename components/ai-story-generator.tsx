@@ -295,19 +295,25 @@ export default function AIStoryGenerator({
 
     // Simulate API call
     setTimeout(() => {
-      const mockStory = `In the neon-soaked streets of Neo-Tokyo, where the rain never stopped and the holograms danced like ghosts, ${mainCharacterName || 'Kael'
-        } tightened ${mainCharacterName ? 'their' : 'his'
-        } grip on the data-drive. "They said it couldn't be done," ${mainCharacterName ? 'they' : 'he'
-        } muttered, the cybernetic implant in ${mainCharacterName ? 'their' : 'his'
-        } left eye whirring softly.
+      const mockStory = `In the neon-soaked streets of Neo-Tokyo, where the rain never stopped and the holograms danced like ghosts, ${
+        mainCharacterName || 'Kael'
+      } tightened ${
+        mainCharacterName ? 'their' : 'his'
+      } grip on the data-drive. "They said it couldn't be done," ${
+        mainCharacterName ? 'they' : 'he'
+      } muttered, the cybernetic implant in ${
+        mainCharacterName ? 'their' : 'his'
+      } left eye whirring softly.
 
 The corporation known as Omni-Corp had eyes everywhere, but they didn't have this. A code so pure, so chaotic, it could rewrite reality itself.
 
-Suddenly, a shadow detached itself from the alley wall. "Hand it over, ${mainCharacterName || 'Kael'
-        }," a voice rasped, metallic and cold. It was Unit 734, a hunter-killer droid with a reputation for leaving no witnesses.
+Suddenly, a shadow detached itself from the alley wall. "Hand it over, ${
+        mainCharacterName || 'Kael'
+      }," a voice rasped, metallic and cold. It was Unit 734, a hunter-killer droid with a reputation for leaving no witnesses.
 
-${mainCharacterName || 'Kael'} smirked, pulling ${mainCharacterName ? 'their' : 'his'
-        } plasma-pistol from its holster. "Come and get it, tin can."
+${mainCharacterName || 'Kael'} smirked, pulling ${
+        mainCharacterName ? 'their' : 'his'
+      } plasma-pistol from its holster. "Come and get it, tin can."
 
 The air crackled with energy as the first shot was fired...`;
 
@@ -459,9 +465,10 @@ The air crackled with energy as the first shot was fired...`;
                         onClick={() => toggleGenre(g)}
                         className={`
                           font-bangers text-lg px-4 py-2 rounded-lg border-4 border-black transition-all transform hover:-translate-y-1
-                          ${selectedGenres.includes(g)
-                            ? 'bg-blue-400 text-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] rotate-1'
-                            : 'bg-white text-black shadow-[2px_2px_0px_0px_rgba(0,0,0,0.2)] hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]'
+                          ${
+                            selectedGenres.includes(g)
+                              ? 'bg-blue-400 text-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] rotate-1'
+                              : 'bg-white text-black shadow-[2px_2px_0px_0px_rgba(0,0,0,0.2)] hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]'
                           }
                         `}
                       >
@@ -569,10 +576,11 @@ The air crackled with energy as the first shot was fired...`;
                               <button
                                 key={trait}
                                 onClick={() => toggleTrait(trait)}
-                                className={`px-3 py-1 rounded-md border-2 border-black text-sm font-bold transition-all ${characterTraits.includes(trait)
-                                  ? 'bg-blue-400 text-white'
-                                  : 'bg-white text-black hover:bg-gray-100'
-                                  }`}
+                                className={`px-3 py-1 rounded-md border-2 border-black text-sm font-bold transition-all ${
+                                  characterTraits.includes(trait)
+                                    ? 'bg-blue-400 text-white'
+                                    : 'bg-white text-black hover:bg-gray-100'
+                                }`}
                               >
                                 {trait}
                               </button>
@@ -1187,10 +1195,11 @@ The air crackled with energy as the first shot was fired...`;
                               <button
                                 key={theme}
                                 onClick={() => toggleTheme(theme.toLowerCase())}
-                                className={`px-3 py-1 rounded-md border-2 border-black text-sm font-bold transition-all ${secondaryThemes.includes(theme.toLowerCase())
-                                  ? 'bg-pink-400 text-white'
-                                  : 'bg-white text-black hover:bg-gray-100'
-                                  }`}
+                                className={`px-3 py-1 rounded-md border-2 border-black text-sm font-bold transition-all ${
+                                  secondaryThemes.includes(theme.toLowerCase())
+                                    ? 'bg-pink-400 text-white'
+                                    : 'bg-white text-black hover:bg-gray-100'
+                                }`}
                               >
                                 {theme}
                               </button>
@@ -1544,10 +1553,11 @@ The air crackled with energy as the first shot was fired...`;
                                     ]);
                                   }
                                 }}
-                                className={`px-3 py-1 rounded-md border-2 border-black text-sm font-bold transition-all ${avoidCliches.includes(trope.toLowerCase())
-                                  ? 'bg-red-400 text-white'
-                                  : 'bg-white text-black hover:bg-gray-100'
-                                  }`}
+                                className={`px-3 py-1 rounded-md border-2 border-black text-sm font-bold transition-all ${
+                                  avoidCliches.includes(trope.toLowerCase())
+                                    ? 'bg-red-400 text-white'
+                                    : 'bg-white text-black hover:bg-gray-100'
+                                }`}
                               >
                                 {trope}
                               </button>
@@ -1585,10 +1595,11 @@ The air crackled with energy as the first shot was fired...`;
                                     ]);
                                   }
                                 }}
-                                className={`px-3 py-1 rounded-md border-2 border-black text-sm font-bold transition-all ${includeTropes.includes(trope.toLowerCase())
-                                  ? 'bg-green-400 text-white'
-                                  : 'bg-white text-black hover:bg-gray-100'
-                                  }`}
+                                className={`px-3 py-1 rounded-md border-2 border-black text-sm font-bold transition-all ${
+                                  includeTropes.includes(trope.toLowerCase())
+                                    ? 'bg-green-400 text-white'
+                                    : 'bg-white text-black hover:bg-gray-100'
+                                }`}
                               >
                                 {trope}
                               </button>

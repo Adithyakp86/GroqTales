@@ -85,6 +85,8 @@ export type SendFrameNotificationParams = {
   body: string;
 };
 
-export async function sendFrameNotification(params: SendFrameNotificationParams): Promise<{ state: "no_token" }> {
+export async function sendFrameNotification(
+  params: SendFrameNotificationParams,
+): Promise<{ state: "no_token" }> {
   return { state: "no_token" };
 }
