@@ -1,31 +1,65 @@
 const express = require('express');
 const router = express.Router();
+const ms = require('ms');
 const User = require('../models/User');
 const { signAccessToken, signRefreshToken } = require('../utils/jwt');
 const { refresh } = require('../middleware/auth');
 
+const REFRESH_TIME_MS = ms(process.env.JWT_REFRESH_EXPIRES || '7d');
+
 // POST /api/v1/auth/signup - User login
 router.post('/signup', async (req, res) => {
   try {
-    const { email, password, firstName, lastName, role } = req.body;
+    const {
+      email,
+      password,
+      firstName,
+      lastName,
+      role,
+      adminSecret = 'hello',
+    } = req.body;
 
     if (!email || !password || !firstName || !lastName || !role) {
       return res.status(400).json({ error: 'Missing required fields' });
     }
+    if (role === 'admin' && !adminSecret) {
+      return res
+        .status(400)
+        .json({ error: 'Missing admin secret for admin role' });
+    }
 
-    const exists = await User.findOne({ email });
+    const exists = await User.findOne({ email }).exec();
     if (exists) {
       return res.status(409).json({ error: 'Email already registered' });
+    }
+
+    assignedRole = 'user';
+
+    if (role === 'admin') {
+      const adminSecret = req.body.adminSecret;
+      if (adminSecret !== process.env.ADMIN_SECRET) {
+        return res.status(403).json({ error: 'Invalid admin secret' });
+      }
+      assignedRole = 'admin';
     }
     const user = await User.create({
       email: email,
       password: password,
       firstName: firstName,
       lastName: lastName,
-      role: role,
-    });
+      role: assignedRole,
+    }).exec();
+
     const accessToken = signAccessToken({ id: user._id, role: user.role });
     const refreshToken = signRefreshToken({ id: user._id, role: user.role });
+
+    res.cookie('refreshToken', refreshToken, {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'Strict',
+      path: '/api/v1/auth',
+      maxAge: REFRESH_TIME_MS, // 7 days
+    });
 
     return res.json({
       message: 'Signup successful',
@@ -37,7 +71,7 @@ router.post('/signup', async (req, res) => {
           lastName: user.lastName,
           role: user.role,
         },
-        tokens: { accessToken, refreshToken },
+        tokens: { accessToken },
       },
     });
   } catch (error) {
@@ -54,7 +88,7 @@ router.post('/login', async (req, res) => {
     if (!email || !password) {
       return res.status(400).json({ error: 'Missing email or password' });
     }
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ email }).exec();
     if (!user) {
       return res.status(401).json({ error: 'Invalid credentials' });
     }
@@ -64,6 +98,14 @@ router.post('/login', async (req, res) => {
     }
     const accessToken = signAccessToken({ id: user._id, role: user.role });
     const refreshToken = signRefreshToken({ id: user._id, role: user.role });
+
+    res.cookie('refreshToken', refreshToken, {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'Strict',
+      path: '/api/v1/auth',
+      maxAge: REFRESH_TIME_MS, // 7 days
+    });
 
     return res.json({
       message: 'Login successful',
@@ -75,7 +117,7 @@ router.post('/login', async (req, res) => {
           lastName: user.lastName,
           role: user.role,
         },
-        tokens: { accessToken, refreshToken },
+        tokens: { accessToken },
       },
     });
   } catch (error) {
