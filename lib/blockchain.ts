@@ -15,23 +15,44 @@ const CONTRACT_ABI = [
 ];
 
 /**
- * Initializes the wallet and contract instance.
- * Re-initialized per call to ensure freshness or handle rotation if needed.
+ * Initializes the wallet and contract instance with strict validation.
+ * Fails fast if configuration is invalid.
  */
 function getContract() {
-  const provider = new ethers.JsonRpcProvider(RPC_URL);
-  const wallet = new ethers.Wallet(PRIVATE_KEY!, provider);
-  const contract = new ethers.Contract(CONTRACT_ADDRESS!, CONTRACT_ABI, wallet);
-  return { contract, provider, wallet };
+  if (!RPC_URL) throw new Error("Blockchain Config Error: Missing 'MONAD_RPC_URL'");
+  if (!PRIVATE_KEY) throw new Error("Blockchain Config Error: Missing 'MINT_AUTHORITY_PRIVATE_KEY'");
+  if (!CONTRACT_ADDRESS) throw new Error("Blockchain Config Error: Missing 'NEXT_PUBLIC_CONTRACT_ADDR'");
+
+  if (!ethers.isAddress(CONTRACT_ADDRESS)) {
+    throw new Error(`Blockchain Config Error: Invalid Contract Address format '${CONTRACT_ADDRESS}'`);
+  }
+
+  try {
+    const provider = new ethers.JsonRpcProvider(RPC_URL);
+    
+    const wallet = new ethers.Wallet(PRIVATE_KEY, provider);
+    
+    const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, wallet);
+    
+    return { contract, provider, wallet };
+  } catch (error: any) {
+    throw new Error(`Blockchain Adapter Init Failed: ${error.message}`);
+  }
 }
 
 /**
  * Submits a mint transaction to the Monad blockchain.
- * Returns the Transaction Hash immediately (does not wait for confirmation).
+ * Returns the Transaction Hash immediately.
  */
 export async function mintNFT(toAddress: string, tokenURI: string): Promise<string> {
   try {
     const { contract } = getContract();
+    
+    if (!ethers.isAddress(toAddress)) {
+      throw new Error(`Invalid recipient address: ${toAddress}`);
+    }
+
+    console.log(`[Blockchain] Submitting mint for ${toAddress}...`);
     
     const tx = await contract.safeMint!(toAddress, tokenURI);
     
@@ -46,11 +67,11 @@ export async function mintNFT(toAddress: string, tokenURI: string): Promise<stri
 /**
  * Checks the status of a submitted transaction.
  * Returns 'pending', 'confirmed', or 'reverted'.
- * If confirmed, attempts to extract the Token ID from logs.
  */
 export async function checkTxStatus(txHash: string) {
   try {
     const { provider } = getContract();
+    
     const receipt = await provider.getTransactionReceipt(txHash);
 
     if (!receipt) {

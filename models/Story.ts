@@ -7,12 +7,15 @@ export interface IStory extends Document {
   ipfsHash?: string;
   coverImage?: string;
   
-  status: 'draft' | 'publishing' | 'minted' | 'failed';
+  status: 'draft' | 'publishing' | 'minted' | 'failed' | 'published';
+  
   nftTxHash?: string;
   nftTokenId?: string;
   
   createdAt: Date;
   updatedAt: Date;
+  
+  [key: string]: any; 
 }
 
 const StorySchema = new Schema<IStory>({
@@ -30,7 +33,7 @@ const StorySchema = new Schema<IStory>({
   
   status: { 
     type: String, 
-    enum: ['draft', 'publishing', 'minted', 'failed'], 
+    enum: ['draft', 'publishing', 'minted', 'failed', 'published'], 
     default: 'draft',
     index: true 
   },
@@ -38,7 +41,8 @@ const StorySchema = new Schema<IStory>({
   nftTxHash: { type: String },
   nftTokenId: { type: String },
 }, { 
-  timestamps: true 
+  timestamps: true,
+  strict: false 
 });
 
 StorySchema.index({ authorWallet: 1, status: 1 });
