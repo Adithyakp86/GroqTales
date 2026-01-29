@@ -232,7 +232,9 @@ graph TD
 
 ---
 
----
+## Program Structure
+
+```
 
 GroqTales/
 │
@@ -290,7 +292,7 @@ GroqTales/
 ├── tailwind.config.ts        # Tailwind CSS configuration (TS)
 ├── tsconfig.json             # TypeScript configuration
 └── vercel.json               # Vercel deployment settings
-
+```
 
 
 ---
