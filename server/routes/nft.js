@@ -207,8 +207,8 @@ router.delete('/burn/:Id', authRequired, async (req, res) => {
 
 router.patch('/list/:tokenId', authRequired, async (req, res) => {
   try {
-    const { price } = req.body;
-    if (price === undefined || isNaN(price) || price < 0) {
+    const price = Number(req.body.price);
+    if (!Number.isFinite(price) || price < 0) {
       return res
         .status(400)
         .json({ error: 'Invalid price or price is missing' });
@@ -231,7 +231,7 @@ router.patch('/list/:tokenId', authRequired, async (req, res) => {
     if (nft.isListed) {
       return res.status(400).json({ error: 'NFT is already listed' });
     }
-    
+
     nft.isListed = true;
     nft.price = price;
     await nft.save();
@@ -252,7 +252,7 @@ router.patch('/remove/:tokenId', authRequired, async (req, res) => {
     if (!tokenId) {
       return res.status(400).json({ error: 'Token ID is required' });
     }
-    const nft = await Nft.findOne({ tokenId: tokenId });
+    const nft = await Nft.findOne({ tokenId: tokenId, isListed: true });
     if (!nft) {
       return res.status(404).json({ error: 'NFT not found' });
     }
@@ -281,13 +281,9 @@ router.patch('/buy/:tokenId', authRequired, async (req, res) => {
     if (!tokenId) {
       return res.status(400).json({ error: 'Token ID is required' });
     }
-    const nft = await Nft.findOne({ tokenId: tokenId });
+    const nft = await Nft.findOne({ tokenId: tokenId, isListed: true });
     if (!nft) {
       return res.status(404).json({ error: 'NFT not found' });
-    }
-
-    if (!nft.isListed) {
-      return res.status(400).json({ error: 'NFT is not listed for sale' });
     }
 
     if (nft.owner.toString() === req.user.id) {
@@ -321,7 +317,10 @@ router.patch('/update-price/:tokenId', authRequired, async (req, res) => {
     if (!tokenId) {
       return res.status(400).json({ error: 'Token ID is required' });
     }
-    const nft = await Nft.findOne({ tokenId: tokenId });
+    const nft = await Nft.findOne({
+      tokenId: tokenId,
+      isListed: true,
+    });
     if (!nft) {
       return res.status(404).json({ error: 'NFT not found' });
     }
@@ -329,9 +328,6 @@ router.patch('/update-price/:tokenId', authRequired, async (req, res) => {
       return res
         .status(403)
         .json({ error: 'You are not the owner of this NFT' });
-    }
-    if (!nft.isListed) {
-      return res.status(400).json({ error: 'NFT is not listed' });
     }
 
     nft.price = price;
