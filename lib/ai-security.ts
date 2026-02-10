@@ -125,7 +125,6 @@ const INJECTION_PATTERNS: { name: string; pattern: RegExp }[] = [
 const SYSTEM_PROMPT_FRAGMENTS: string[] = [
   'you are a creative writing assistant',
   'you are a literary analysis expert',
-  'you are a creative writing assistant',
   'you are an expert editor and writing coach',
   'you are a helpful ai assistant',
   'focus on compelling narratives',
@@ -241,6 +240,28 @@ export function validateInput(
 
   for (const { name, pattern } of INJECTION_PATTERNS) {
     if (pattern.test(input)) {
+      // If dryRun is enabled, log but allow
+      if (_config.dryRun) {
+        logSecurityEvent({
+          type: 'injection_attempt',
+          details: {
+            field: 'input',
+            reason: 'Input contains a disallowed pattern (Dry Run).',
+            matchedPattern: name,
+            inputSnippet: input.substring(0, 50),
+          },
+        });
+        // Continue checking other patterns or return valid? 
+        // Usually dryRun means "would have blocked", so we just log and continue or return valid at the end.
+        // Let's just log this specific hit and return invalid ONLY if dryRun is false.
+        
+        // Actually, if we want to catch ALL patterns, we should continue. 
+        // But for simplicity/performance in this specific function, returning the first hit (as valid) is fine 
+        // if we just want to know "it would have failed".
+        // However, to be safe, let's just Log and NOT return false.
+        continue; 
+      }
+
       return {
         isValid: false,
         reason: 'Input contains a disallowed pattern.',
@@ -289,7 +310,20 @@ export function validateOutput(output: string): OutputValidationResult {
     }
   }
 
-  return { isSafe: flags.length === 0, flags };
+  const isSafe = flags.length === 0;
+
+  if (!isSafe && _config.dryRun) {
+    logSecurityEvent({
+      type: 'output_flagged',
+      details: {
+        flags,
+        note: 'Dry Run: Content would have been blocked.',
+      },
+    });
+    return { isSafe: true, flags };
+  }
+
+  return { isSafe, flags };
 }
 
 // ---------------------------------------------------------------------------

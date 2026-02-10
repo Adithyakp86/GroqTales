@@ -145,6 +145,8 @@ export async function generateStoryContent(
         type: 'output_flagged',
         details: { flags: outputCheck.flags },
       });
+      // Block content if it contains sensitive leaks
+      throw new Error('Generated content was blocked due to security policy violations.');
     }
 
     return generatedContent;
@@ -227,6 +229,7 @@ export async function analyzeStoryContent(
         type: 'output_flagged',
         details: { flags: outputCheck.flags },
       });
+      throw new Error('Analysis result was blocked due to security policy violations.');
     }
 
     try {
@@ -327,6 +330,16 @@ export async function generateStoryIdeas(
 
     const data = await response.json();
     const content = data.choices[0]?.message?.content || '';
+
+    // --- Security: validate output ---
+    const outputCheck = validateOutput(content);
+    if (!outputCheck.isSafe) {
+      logSecurityEvent({
+        type: 'output_flagged',
+        details: { flags: outputCheck.flags },
+      });
+      throw new Error('Generated ideas were blocked due to security policy violations.');
+    }
 
     return content
       .split('\n')
@@ -436,6 +449,7 @@ export async function improveStoryContent(
         type: 'output_flagged',
         details: { flags: outputCheck.flags },
       });
+       throw new Error('Improved content was blocked due to security policy violations.');
     }
 
     return improvedContent;
@@ -663,10 +677,25 @@ export async function analyzeStoryContentCustom(
       sanitizedCustomPrompt = sanitized;
     }
 
+    // --- Security: sanitize & validate system prompt ---
+    let sanitizedSystemPrompt = systemPrompt;
+    if (options.systemPrompt) {
+      const { sanitized } = sanitizeInput(options.systemPrompt);
+      const systemPromptValidation = validateInput(sanitized);
+      if (!systemPromptValidation.isValid) {
+        logSecurityEvent({
+          type: 'injection_attempt',
+          details: { field: 'systemPrompt', reason: systemPromptValidation.reason, pattern: systemPromptValidation.matchedPattern },
+        });
+        throw new Error(`Invalid input for system prompt: ${systemPromptValidation.reason}`);
+      }
+      sanitizedSystemPrompt = sanitized;
+    }
+
     const userPrompt =
       sanitizedCustomPrompt || `Analyze this story content:\n\n${sanitizedContent}`;
 
-    const hardenedSystemPrompt = buildHardenedSystemPrompt(systemPrompt);
+    const hardenedSystemPrompt = buildHardenedSystemPrompt(sanitizedSystemPrompt);
 
     const response = await fetch(
       'https://api.groq.com/openai/v1/chat/completions',
@@ -710,6 +739,7 @@ export async function analyzeStoryContentCustom(
         type: 'output_flagged',
         details: { flags: outputCheck.flags },
       });
+      throw new Error('Analysis result was blocked due to security policy violations.');
     }
 
     return result;
@@ -760,7 +790,22 @@ export async function generateContentCustom(
       throw new Error(`Invalid input for prompt: ${promptValidation.reason}`);
     }
 
-    const hardenedSystemPrompt = buildHardenedSystemPrompt(systemPrompt);
+    // --- Security: sanitize & validate system prompt ---
+    let sanitizedSystemPrompt = systemPrompt;
+    if (options.systemPrompt) {
+      const { sanitized } = sanitizeInput(options.systemPrompt);
+      const systemPromptValidation = validateInput(sanitized);
+      if (!systemPromptValidation.isValid) {
+        logSecurityEvent({
+          type: 'injection_attempt',
+          details: { field: 'systemPrompt', reason: systemPromptValidation.reason, pattern: systemPromptValidation.matchedPattern },
+        });
+        throw new Error(`Invalid input for system prompt: ${systemPromptValidation.reason}`);
+      }
+      sanitizedSystemPrompt = sanitized;
+    }
+
+    const hardenedSystemPrompt = buildHardenedSystemPrompt(sanitizedSystemPrompt);
 
     const response = await fetch(
       'https://api.groq.com/openai/v1/chat/completions',
@@ -804,6 +849,7 @@ export async function generateContentCustom(
         type: 'output_flagged',
         details: { flags: outputCheck.flags },
       });
+      throw new Error('Generated content was blocked due to security policy violations.');
     }
 
     return result;
