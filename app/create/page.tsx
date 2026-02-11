@@ -265,22 +265,22 @@ export default function CreateStoryPage() {
       storyData.coverImage;
     if (!hasAnyDraftData) return;
 
-     const timeout = setTimeout(() => {
-       const draft: StoryDraft = {
-         title: storyData.title,
-         description: storyData.description,
-         genre: storyData.genre,
-         content: storyData.content,
-         coverImageName: storyData.coverImage?.name,
-         updatedAt: Date.now(),
-         version: 1,
-       };
+    const timeout = setTimeout(() => {
+      const draft: StoryDraft = {
+        title: storyData.title,
+        description: storyData.description,
+        genre: storyData.genre,
+        content: storyData.content,
+        coverImageName: storyData.coverImage?.name,
+        updatedAt: Date.now(),
+        version: 1,
+      };
       try {
         localStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
       } catch (error) {
         console.warn('Autosave failed:', error);
       }
-     }, 1000); // autosave every 1s after typing stops
+    }, 1000); // autosave every 1s after typing stops
 
     return () => clearTimeout(timeout);
   }, [storyData.title, storyData.description, storyData.genre, storyData.content, storyData.coverImage]);
@@ -595,9 +595,8 @@ export default function CreateStoryPage() {
                 <CardTitle>
                   Create Your{' '}
                   {storyType
-                    ? `${
-                        storyType.charAt(0).toUpperCase() + storyType.slice(1)
-                      } `
+                    ? `${storyType.charAt(0).toUpperCase() + storyType.slice(1)
+                    } `
                     : ''}
                   Story
                   {storyFormat === 'nft' && ' NFT'}
@@ -701,7 +700,7 @@ export default function CreateStoryPage() {
                   value={storyData.genre}
                   defaultValue={storyData.genre}
                 >
-                  <SelectTrigger>
+                  <SelectTrigger id="genre">
                     <SelectValue placeholder="Select a genre" />
                   </SelectTrigger>
                   <SelectContent>
@@ -802,7 +801,7 @@ export default function CreateStoryPage() {
                         2. A unique NFT will be created with your story metadata
                       </li>
                       <li>
-                        3. You'll be able to manage and sell your story NFT from
+                        3. You&apos;ll be able to manage and sell your story NFT from
                         your profile
                       </li>
                     </>
